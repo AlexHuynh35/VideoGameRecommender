@@ -2,9 +2,9 @@ import psycopg2
 
 class DatabaseController:
     def __init__(self):
-        self.dbname, self.user, self.password, self.host, self.port = self.__retrieveDatabaseInfo()
+        self.dbname, self.user, self.password, self.host, self.port = self.__retrieve_database_info()
 
-    def __retrieveDatabaseInfo(self):
+    def __retrieve_database_info(self):
         dbname = input("Input the name of the database: ")
         user = input("Input the username: ")
         password = input("Input the password: ")
@@ -12,7 +12,15 @@ class DatabaseController:
         port = "5432"
         return dbname, user, password, host, port
 
-    def storeToDatabase(self, gamesJSON):
+    def get_or_insert(self, cursor, table, id_column, name_column, record_id, record_name):
+        cursor.execute(f"SELECT id FROM {table} WHERE {id_column} = %s;", (record_id,))
+        result = cursor.fetchone()
+        if result:
+            return result[0]
+        cursor.execute(f"INSERT INTO {table} ({id_column}, {name_column}) VALUES (%s, %s) RETURNING id;", (record_id, record_name))
+        return cursor.fetchone()[0]
+
+    def store_to_database(self, games_json):
         conn = psycopg2.connect(
             dbname = self.dbname,
             user = self.user,
@@ -21,53 +29,32 @@ class DatabaseController:
             port = self.port
         )
         cursor = conn.cursor()
-        for game in gamesJSON:
-            cursor.execute("""
-                INSERT INTO games (name, rating, platforms, genres)
-                VALUES (%s, %s, %s, %s)
-            """, (
-                game["name"],
-                game.get("rating", None),
-                ", ".join([p["name"] for p in game.get("platforms", [])]),
-                ", ".join([g["name"] for g in game.get("genres", [])])
-            ))
+        for game in games_json:
+            game_id = game["id"]
+            name = game.get("name")
+            release_date = game.get("first_release_date")
+            rating = game.get("rating")
+            cover_url = game.get("cover", {}).get("url")
+            cursor.execute(
+                "INSERT INTO games (id, name, first_release_date, rating, cover_url) VALUES (%s, %s, to_timestamp(%s), %s, %s) ON CONFLICT (id) DO NOTHING;",
+                (game_id, name, release_date, rating, cover_url)
+            )
+            for genre in game.get("genres", []):
+                genre_id = genre["id"]
+                genre_name = genre["name"]
+                self.get_or_insert(cursor, "genres", "id", "name", genre_id, genre_name)
+                cursor.execute("INSERT INTO game_genres (game_id, genre_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;", (game_id, genre_id))
+            for platform in game.get("platforms", []):
+                platform_id = platform["id"]
+                platform_name = platform["name"]
+                self.get_or_insert(cursor, "platforms", "id", "name", platform_id, platform_name)
+                cursor.execute("INSERT INTO game_platforms (game_id, platform_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;", (game_id, platform_id))
+            for company_data in game.get("involved_companies", []):
+                company_id = company_data["company"]["id"]
+                company_name = company_data["company"]["name"]
+                self.get_or_insert(cursor, "companies", "id", "name", company_id, company_name)
+                cursor.execute("INSERT INTO game_companies (game_id, company_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;", (game_id, company_id))
         conn.commit()
         cursor.close()
         conn.close()
-        print("Data stored to PostgreSQL!")
-
-    def __retrieveData(self, numGames):
-        cursor.execute("SELECT * FROM games LIMIT " + numGames + ";")
-        rows = cursor.fetchall()
-        for row in rows:
-            print(row)
-        print("Here is the data you requested!")
-
-    def __clearDatabase(self):
-        cursor.execute("TRUNCATE TABLE games RESTART IDENTITY CASCADE;")
-        conn.commit()
-        print("Database has been cleared!")
-
-    def retrieveAndClearData(self):
-        conn = psycopg2.connect(
-            dbname = self.dbname,
-            user = self.user,
-            password = self.password,
-            host = self.host,
-            port = self.port
-        )
-        cursor = conn.cursor()
-        userInput = input("Do you want to retrieve, clear, or exit?")
-        while userInput != "exit":
-            if userInput == "retrieve":
-                numGames = input("How many game data do you want to retrieve?")
-                try:
-                    self.__retrieveData(numGames)
-                except:
-                    print("You did not enter a valid number!")
-            else if userInput == "clear":
-                self.__clearDatabase()
-            userInput = input("Do you want to retrieve, clear, or exit?")
-        cursor.close()
-        conn.close()
-        print("Control of database ended!")
+        print("Data inserted successfully!")
