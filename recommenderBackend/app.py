@@ -31,10 +31,30 @@ def test_return_ten_games():
 
 @app.route("/test_full_game_item")
 def test_full_game_item():
+    conn = psycopg2.connect (
+        dbname = my_db.dbname,
+        user = my_db.user,
+        password = my_db.password,
+        host = my_db.host,
+        port = my_db.port
+    )
+    cursor = conn.cursor()
+    cursor.close()
+    conn.close()
     return "Video Game Recommender"
 
 @app.route("/test_full_game_list")
 def test_full_game_list():
+    conn = psycopg2.connect (
+        dbname = my_db.dbname,
+        user = my_db.user,
+        password = my_db.password,
+        host = my_db.host,
+        port = my_db.port
+    )
+    cursor = conn.cursor()
+    cursor.close()
+    conn.close()
     return "Video Game Recommender"
 
 if __name__ == "__main__":
