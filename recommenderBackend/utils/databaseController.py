@@ -5,9 +5,10 @@ class DatabaseController:
         self.dbname, self.user, self.password, self.host, self.port = self.__retrieve_database_info()
 
     def __retrieve_database_info(self):
-        dbname = input("Input the name of the database: ")
-        user = input("Input the username: ")
-        password = input("Input the password: ")
+        info = input("Input the name of the database, the username, and the password: ").split(" ")
+        dbname = info[0]
+        user = info[1]
+        password = info[2]
         host = "localhost"
         port = "5432"
         return dbname, user, password, host, port
