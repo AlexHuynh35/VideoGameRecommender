@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchGames } from "./services/api";
+import BulletList from './utilsComp/BulletList.tsx'
 
 type Game = {
   id: number;
@@ -7,6 +8,9 @@ type Game = {
   first_release_date: string;
   rating: number;
   cover_url: string;
+  genres: string[];
+  platforms: string[];
+  companies: string[];
 };
 
 function App() {
@@ -35,15 +39,19 @@ function App() {
       <h1>Game List</h1>
       <ul>
         {games.map((game) => {
-          console.log("Rendering game:", game);
           return (
-          <li key={game.id}>
-            <img src={game.cover_url} alt={game.name} width="100" />
-            <p>
-              <strong>{game.name}</strong> - Rating: {game.rating} - Released: {game.first_release_date}
-            </p>
-          </li>
-        );
+            <div>
+              <li key={game.id}>
+                <img src={game.cover_url} alt={game.name} width="100" />
+                <p>
+                  <strong>{game.name}</strong> - Rating: {game.rating} - Released: {game.first_release_date}
+                </p>
+              </li>
+              <BulletList listType="genres" list={game.genres} />
+              <BulletList listType="platforms" list={game.platforms} />
+              <BulletList listType="companies" list={game.companies} />
+            </div>
+          );
         })}
       </ul>
     </div>
