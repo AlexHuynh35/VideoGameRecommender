@@ -1,8 +1,5 @@
-def retrieve_game_info(cursor, numGames):
-    game_info_query = "SELECT id, name, first_release_date, rating, cover_url FROM games LIMIT %s;"
-    cursor.execute(game_info_query, (numGames,))
-    games = cursor.fetchall()
-    game_id_list = [game[0] for game in games]
+def retrieve_game_info(cursor, games):
+    game_id_list = [games[0] for game in games]
 
     game_genre_query = """
     SELECT games.id AS game_id, ARRAY_AGG(genres.name) AS genres
@@ -48,6 +45,40 @@ def retrieve_game_info(cursor, numGames):
         games_with_all_info.append(game + (game_genres, game_platforms, game_companies))
     return games_with_all_info
 
+def retrieve_game_info_with_filters(cursor, genres, platforms, page):
+    genre_placeholders = ','.join(['%s'] * len(genres))
+    platform_placeholders = ','.join(['%s'] * len(platforms))
+    
+    game_info_query = f"""
+    SELECT
+        ga.id,
+        ga.name,
+        ga.first_release_date,
+        ga.rating,
+        ga.cover_url,
+        ARRAY_AGG(DISTINCT ge.name) AS genres,
+        ARRAY_AGG(DISTINCT pl.name) AS platforms,
+        ARRAY_AGG(DISTINCT co.name) AS companies
+    FROM games AS ga
+    LEFT JOIN game_genres AS gg ON ga.id = gg.game_id
+    LEFT JOIN genres AS ge ON gg.genre_id = ge.id
+    LEFT JOIN game_platforms AS gp ON ga.id = gp.game_id
+    LEFT JOIN platforms AS pl ON gp.platform_id = pl.id
+    LEFT JOIN game_companies AS gc ON ga.id = gc.game_id
+    LEFT JOIN companies AS co ON gc.company_id = co.id
+    WHERE
+        ga.id NOT IN (SELECT game_id FROM game_genres WHERE genre_id IN ({genre_placeholders}))
+        AND ga.id NOT IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({platform_placeholders}))
+    GROUP BY ga.id
+    LIMIT 20
+    OFFSET %s;
+    """
+
+    params = tuple(genres + platforms + [page * 20])
+    cursor.execute(game_info_query, params)
+    games = cursor.fetchall()
+    return games
+
 def readable_game_list(games):
     game_list = []
     for game in games:
@@ -62,3 +93,9 @@ def readable_game_list(games):
             "companies": game[7]
         })
     return game_list
+
+def retrieve_certain_number_of_games(cursor, number):
+    game_info_query = "SELECT id, name, first_release_date, rating, cover_url FROM games LIMIT %s;"
+    cursor.execute(game_info_query, (number,))
+    games = cursor.fetchall()
+    return retrieve_game_info(games)

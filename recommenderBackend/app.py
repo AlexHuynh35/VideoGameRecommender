@@ -23,13 +23,13 @@ def test_return_ten_games():
         port = my_db.port
     )
     cursor = conn.cursor()
-    games = helper.retrieve_game_info(cursor, 10)
+    games = helper.retrieve_certain_number_of_games(cursor, 10)
     game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()
     return jsonify(game_list)
 
-@app.route("/test_full_game_item")
+@app.route("/test_return_filtered_game_list")
 def test_full_game_item():
     conn = psycopg2.connect (
         dbname = my_db.dbname,
@@ -39,9 +39,11 @@ def test_full_game_item():
         port = my_db.port
     )
     cursor = conn.cursor()
+    games = helper.retrieve_game_info_with_filters(cursor, [31, 13, 14], [130, 167], 2)
+    game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()
-    return "Video Game Recommender"
+    return jsonify(game_list)
 
 @app.route("/test_full_game_list")
 def test_full_game_list():
