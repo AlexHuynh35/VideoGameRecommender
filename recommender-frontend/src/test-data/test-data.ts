@@ -15,7 +15,7 @@ export const placeholder: Game[] = [
     name: "placeholder",
     firstReleaseDate: "placeholder",
     rating: 0,
-    coverUrl: "/vercel.svg",
+    coverUrl: "/placeholder.jpg",
     genres: ["placeholder"],
     platforms: ["placeholder"],
     companies: ["placeholder"],
