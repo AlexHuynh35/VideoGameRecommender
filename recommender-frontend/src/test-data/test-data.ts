@@ -13,11 +13,11 @@ export const placeholder: Game[] = [
   {
     id: 0,
     name: "placeholder",
-    firstReleaseDate: "placeholder",
+    firstReleaseDate: "2000-01-01",
     rating: 0,
     coverUrl: "/placeholder.jpg",
-    genres: ["placeholder"],
-    platforms: ["placeholder"],
+    genres: ["placeholder", "placeholder"],
+    platforms: ["placeholder", "placeholder", "placeholder"],
     companies: ["placeholder"],
   },
 ]
