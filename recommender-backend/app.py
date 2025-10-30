@@ -2,12 +2,18 @@ import psycopg2
 import utils.appHelperFunc as helper
 from flask import Flask, jsonify
 from flask_cors import CORS
-from utils.databaseController import DatabaseController
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-my_db = DatabaseController()
+app.config["DBNAME"] = os.getenv("DBNAME")
+app.config["DBUSER"] = os.getenv("DBUSER")
+app.config["DBPASS"] = os.getenv("DBPASS")
+app.config["DBHOST"] = os.getenv("DBHOST")
+app.config["DBPORT"] = os.getenv("DBPORT")
 
 @app.route("/test_app")
 def test_app():
@@ -16,11 +22,11 @@ def test_app():
 @app.route("/test_return_ten_games")
 def test_return_ten_games():
     conn = psycopg2.connect (
-        dbname = my_db.dbname,
-        user = my_db.user,
-        password = my_db.password,
-        host = my_db.host,
-        port = my_db.port
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
     games = helper.retrieve_certain_number_of_games(cursor, 10)
@@ -32,11 +38,11 @@ def test_return_ten_games():
 @app.route("/test_return_filtered_game_list")
 def test_full_game_item():
     conn = psycopg2.connect (
-        dbname = my_db.dbname,
-        user = my_db.user,
-        password = my_db.password,
-        host = my_db.host,
-        port = my_db.port
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
     games = helper.retrieve_game_info_with_filters(cursor, [31, 13, 14], [130, 167], 2)
@@ -48,11 +54,11 @@ def test_full_game_item():
 @app.route("/test_full_game_list")
 def test_full_game_list():
     conn = psycopg2.connect (
-        dbname = my_db.dbname,
-        user = my_db.user,
-        password = my_db.password,
-        host = my_db.host,
-        port = my_db.port
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
     cursor.close()

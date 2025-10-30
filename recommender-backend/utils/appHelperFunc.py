@@ -85,9 +85,9 @@ def readable_game_list(games):
         game_list.append({
             "id": game[0], 
             "name": game[1],
-            "first_release_date": game[2], 
+            "firstReleaseDate": game[2], 
             "rating": game[3], 
-            "cover_url": game[4],
+            "coverUrl": game[4],
             "genres": game[5],
             "platforms": game[6],
             "companies": game[7]

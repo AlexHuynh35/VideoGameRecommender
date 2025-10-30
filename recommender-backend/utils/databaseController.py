@@ -2,16 +2,6 @@ import psycopg2
 
 class DatabaseController:
     def __init__(self):
-        self.dbname, self.user, self.password, self.host, self.port = self.__retrieve_database_info()
-
-    def __retrieve_database_info(self):
-        info = input("Input the name of the database, the username, and the password: ").split(" ")
-        dbname = info[0]
-        user = info[1]
-        password = info[2]
-        host = "localhost"
-        port = "5432"
-        return dbname, user, password, host, port
 
     def get_or_insert(self, cursor, table, id_column, name_column, record_id, record_name):
         cursor.execute(f"SELECT id FROM {table} WHERE {id_column} = %s;", (record_id,))
@@ -21,13 +11,13 @@ class DatabaseController:
         cursor.execute(f"INSERT INTO {table} ({id_column}, {name_column}) VALUES (%s, %s) RETURNING id;", (record_id, record_name))
         return cursor.fetchone()[0]
 
-    def store_to_database(self, games_json):
+    def store_to_database(self, games_json, info):
         conn = psycopg2.connect(
-            dbname = self.dbname,
-            user = self.user,
-            password = self.password,
-            host = self.host,
-            port = self.port
+            dbname = info[0]
+            user = info[1]
+            password = info[2]
+            host = info[3]
+            port = info[4]
         )
         cursor = conn.cursor()
         for game in games_json:
