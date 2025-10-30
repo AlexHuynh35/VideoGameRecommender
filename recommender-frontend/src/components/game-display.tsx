@@ -33,7 +33,7 @@ export default function GameDisplay({ game }: GameDisplayProps) {
       </div>
 
       <div className="relative w-70 aspect-[1/1] flex items-center justify-center my-8">
-        <div className="relative w-7/8 aspect-[1/1]">
+        <div className="relative w-7/8 aspect-[1/1] border-6 border-cyan-600">
           <Image
             src={fixedImage}
             alt={game.name}
@@ -49,7 +49,7 @@ export default function GameDisplay({ game }: GameDisplayProps) {
         <div className="absolute top-3 right-3 w-1/4 aspect-[1/1] flex items-center justify-center">
           <div className="absolute inset-0 -m-[10px] bg-yellow-500 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)]" />
           <div className="absolute inset-0 bg-yellow-400 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)] z-10" />
-          <h1 className="text-lg font-bold font-orbiton text-black pt-1 z-20">{game.rating}</h1>
+          <h1 className="text-lg font-bold font-orbiton text-black pt-1 z-20">{Math.round(game.rating)}</h1>
         </div>
       </div>
 
@@ -66,8 +66,8 @@ export default function GameDisplay({ game }: GameDisplayProps) {
         <div className="absolute -top-4 left-4 bg-cyan-500 shadow-md p-2">
           <h1 className="text-lg font-semibold font-orbiton text-black text-center">Genres</h1>
         </div>
-        <div className="p-8">
-          <ul className="text-lg font-rajdhani text-black">
+        <div className="p-8 mt-2">
+          <ul className="text-lg text-center font-rajdhani text-black">
             {game.genres.map((genre, idx) => (
               <li key={idx}>
                 {genre}
@@ -81,8 +81,8 @@ export default function GameDisplay({ game }: GameDisplayProps) {
         <div className="absolute -top-4 left-4 bg-cyan-500 shadow-md p-2">
           <h1 className="text-lg font-semibold font-orbiton text-black text-center">Platforms</h1>
         </div>
-        <div className="p-8">
-          <ul className="text-lg font-rajdhani text-black">
+        <div className="p-8 mt-2">
+          <ul className="text-lg text-center font-rajdhani text-black">
             {game.platforms.map((platform, idx) => (
               <li key={idx}>
                 {platform}
@@ -96,8 +96,8 @@ export default function GameDisplay({ game }: GameDisplayProps) {
         <div className="absolute -top-4 left-4 bg-cyan-500 shadow-md p-2">
           <h1 className="text-lg font-semibold font-orbiton text-black text-center">Companies</h1>
         </div>
-        <div className="p-8">
-          <ul className="text-lg font-rajdhani text-black">
+        <div className="p-8 mt-2">
+          <ul className="text-lg text-center font-rajdhani text-black">
             {game.companies.map((company, idx) => (
               <li key={idx}>
                 {company}
