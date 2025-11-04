@@ -70,11 +70,11 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, page):
         ga.id NOT IN (SELECT game_id FROM game_genres WHERE genre_id IN ({genre_placeholders}))
         AND ga.id NOT IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({platform_placeholders}))
     GROUP BY ga.id
-    LIMIT 20
+    LIMIT 96
     OFFSET %s;
     """
 
-    params = tuple(genres + platforms + [page * 20])
+    params = tuple(genres + platforms + [page * 96])
     cursor.execute(game_info_query, params)
     games = cursor.fetchall()
     return games

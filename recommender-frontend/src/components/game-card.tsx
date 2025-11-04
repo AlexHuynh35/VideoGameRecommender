@@ -6,7 +6,7 @@ type GameCardProps = {
 }
 
 export default function GameCard({ name, image }: GameCardProps) {
-  const fixedImage = (image.startsWith("//") ? `https:${image}` : image).replace("t_thumb", "t_cover_big");
+  const fixedImage = image ? (image.startsWith("//") ? `https:${image}` : image).replace("t_thumb", "t_cover_big") : "/placeholder.jpg";
 
   return (
     <div className="relative w-full aspect-[3/4]">

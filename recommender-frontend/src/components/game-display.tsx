@@ -7,7 +7,7 @@ type GameDisplayProps = {
 }
 
 export default function GameDisplay({ game }: GameDisplayProps) {
-  const fixedImage = (game.coverUrl.startsWith("//") ? `https:${game.coverUrl}` : game.coverUrl).replace("t_thumb", "t_cover_big");
+  const fixedImage = game.coverUrl ? (game.coverUrl.startsWith("//") ? `https:${game.coverUrl}` : game.coverUrl).replace("t_thumb", "t_cover_big") : "/placeholder.jpg";
   return (
     <div className="flex flex-col items-center justify-center p-6">
       <div className="absolute top-0 w-80 h-8 bg-neutral-200 z-30" />

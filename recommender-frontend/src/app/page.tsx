@@ -3,24 +3,28 @@
 import { useEffect, useState } from "react";
 import { GameGallery } from "@/components";
 import { fetchGames } from "@/utilities/api";
-import { placeholder, Game } from "@/test-data/test-data";
+import { Game } from "@/test-data/test-data";
+
+const gamesPerPage = 24;
+const pageNumbers = [1, 2, 3, 4];
 
 export default function Home() {
   const [games, setGames] = useState<Game[]>([]);
+  const [paginatedGames, setPaginatedGames] = useState<Game[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGames()
-      .then((data) => {
-        console.log("Fetched data:", data);
-        setGames(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    fetchGames().then((data) => {
+      setGames(data);
+      setCurrentPage(1);
+      setPaginatedGames(data.slice(0, gamesPerPage));
+      setLoading(false);
+    }).catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) return <p>Loading games...</p>;
@@ -36,8 +40,23 @@ export default function Home() {
           Recommender
         </h1>
       </div>
-      
-      <GameGallery gameList={games} />
+
+      <div className="flex justify-center mt-8 gap-2 items-center">
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            className={`px-3 py-1 ${page === currentPage ? "bg-orange-500 text-white" : "bg-neutral-200"}`}
+            onClick={() => {
+              setCurrentPage(page);
+              setPaginatedGames(games.slice((page - 1) * gamesPerPage, page * gamesPerPage));
+            }}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
+
+      <GameGallery gameList={paginatedGames} />
     </section>
   );
 }
