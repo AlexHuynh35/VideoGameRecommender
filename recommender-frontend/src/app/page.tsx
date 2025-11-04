@@ -41,18 +41,20 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="flex justify-center mt-8 gap-2 items-center">
+      <div className="flex justify-center gap-8">
         {pageNumbers.map((page) => (
-          <button
-            key={page}
-            className={`px-3 py-1 ${page === currentPage ? "bg-orange-500 text-white" : "bg-neutral-200"}`}
-            onClick={() => {
-              setCurrentPage(page);
-              setPaginatedGames(games.slice((page - 1) * gamesPerPage, page * gamesPerPage));
-            }}
-          >
-            {page}
-          </button>
+          <div key={page} className="relative w-12 h-12">
+            <div className="absolute inset-0 bg-orange-500 -m-[5px]" />
+            <div
+              className={`absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-orange-400" : "bg-neutral-200"}`}
+              onClick={() => {
+                setCurrentPage(page);
+                setPaginatedGames(games.slice((page - 1) * gamesPerPage, page * gamesPerPage));
+              }}
+            >
+              {page}
+            </div>
+          </div>
         ))}
       </div>
 
