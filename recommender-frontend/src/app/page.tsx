@@ -28,9 +28,6 @@ export default function Home() {
     });
   }, []);
 
-  if (loading) return <p>Loading games...</p>;
-  if (error) return <p>Error: {error}</p>;
-
   return (
     <section className="p-6">
       <div className="max-w-7xl mx-auto my-12 text-center">
@@ -56,9 +53,7 @@ export default function Home() {
         ) : (
           <div className="relative w-14 h-14">
             <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
-            <div
-              className="absolute inset-0 flex items-center justify-center text-white font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-600"
-            >
+            <div className="absolute inset-0 flex items-center justify-center text-white font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-600">
               &lt;
             </div>
           </div>
@@ -93,7 +88,23 @@ export default function Home() {
         </div>
       </div>
 
-      <GameGallery gameList={paginatedGames} />
+      {loading ? (
+        <div className="max-w-7xl mx-auto my-12 text-center">
+          <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
+            Loading games...
+          </h1>
+        </div>
+      ) : error ? (
+        <div className="max-w-7xl mx-auto my-12 text-center">
+          <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
+            Error: {error}
+          </h1>
+        </div>
+      ) : (
+        <div>
+          <GameGallery gameList={paginatedGames} />
+        </div>
+      )}
     </section>
   );
 }
