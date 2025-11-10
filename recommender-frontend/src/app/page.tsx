@@ -9,16 +9,17 @@ const gamesPerPage = 24;
 const pageNumbers = [1, 2, 3, 4];
 
 export default function Home() {
+  const [currentOffset, setCurrentOffset] = useState<number>(0);
+  const [totalOffsets, setTotalOffsets] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [games, setGames] = useState<Game[]>([]);
   const [paginatedGames, setPaginatedGames] = useState<Game[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchGames().then((data) => {
       setGames(data);
-      setCurrentPage(1);
       setPaginatedGames(data.slice(0, gamesPerPage));
       setLoading(false);
     }).catch((err) => {
@@ -41,12 +42,33 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="flex justify-center gap-8">
+      <div className="flex items-center justify-center gap-8">
+        {currentOffset > 0 ? (
+          <div className="relative w-14 h-14">
+            <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+            <div
+              className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
+              onClick={() => setCurrentOffset(currentOffset - 1)}
+            >
+              &lt;
+            </div>
+          </div>
+        ) : (
+          <div className="relative w-14 h-14">
+            <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+            <div
+              className="absolute inset-0 flex items-center justify-center text-white font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-600"
+            >
+              &lt;
+            </div>
+          </div>
+        )}
+
         {pageNumbers.map((page) => (
           <div key={page} className="relative w-12 h-12">
-            <div className="absolute inset-0 bg-orange-500 -m-[5px]" />
+            <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
             <div
-              className={`absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-orange-400" : "bg-neutral-200"}`}
+              className={`absolute inset-0 flex items-center justify-center font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-neutral-600 text-white" : "bg-neutral-200 text-black"}`}
               onClick={() => {
                 setCurrentPage(page);
                 setPaginatedGames(games.slice((page - 1) * gamesPerPage, page * gamesPerPage));
@@ -56,6 +78,19 @@ export default function Home() {
             </div>
           </div>
         ))}
+
+        <div className="relative w-14 h-14">
+          <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+          <div
+            className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
+            onClick={() => {
+              currentOffset === totalOffsets && setTotalOffsets(totalOffsets + 1);
+              setCurrentOffset(currentOffset + 1);
+            }}
+          >
+            &gt;
+          </div>
+        </div>
       </div>
 
       <GameGallery gameList={paginatedGames} />
