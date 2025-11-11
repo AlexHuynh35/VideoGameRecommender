@@ -6,6 +6,7 @@ import { fetchGames } from "@/utilities/api";
 import { Game } from "@/test-data/test-data";
 
 const gamesPerPage = 24;
+const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
 export default function Home() {
@@ -18,15 +19,16 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGames().then((data) => {
-      setGames(data);
+    fetchGames(totalOffsets).then((data) => {
+      setGames(games.concat(data));
+      setCurrentPage(1);
       setPaginatedGames(data.slice(0, gamesPerPage));
       setLoading(false);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, []);
+  }, [totalOffsets]);
 
   return (
     <section className="p-6">
@@ -45,7 +47,11 @@ export default function Home() {
             <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
             <div
               className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
-              onClick={() => setCurrentOffset(currentOffset - 1)}
+              onClick={() => {
+                setCurrentPage(4);
+                setPaginatedGames(games.slice((currentOffset - 1) * batchSize + 3 * gamesPerPage, (currentOffset - 1) * batchSize + 4 * gamesPerPage));
+                setCurrentOffset(currentOffset - 1);
+              }}
             >
               &lt;
             </div>
@@ -66,10 +72,10 @@ export default function Home() {
               className={`absolute inset-0 flex items-center justify-center font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-neutral-600 text-white" : "bg-neutral-200 text-black"}`}
               onClick={() => {
                 setCurrentPage(page);
-                setPaginatedGames(games.slice((page - 1) * gamesPerPage, page * gamesPerPage));
+                setPaginatedGames(games.slice(currentOffset * batchSize + (page - 1) * gamesPerPage, currentOffset * batchSize + page * gamesPerPage));
               }}
             >
-              {page}
+              {page + currentOffset * 4}
             </div>
           </div>
         ))}
@@ -79,8 +85,15 @@ export default function Home() {
           <div
             className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
             onClick={() => {
-              currentOffset === totalOffsets && setTotalOffsets(totalOffsets + 1);
-              setCurrentOffset(currentOffset + 1);
+              currentOffset === totalOffsets ? (
+                setLoading(true),
+                setTotalOffsets(totalOffsets + 1),
+                setCurrentOffset(currentOffset + 1)
+              ) : (
+                setCurrentPage(1),
+                setPaginatedGames(games.slice((currentOffset + 1) * batchSize, (currentOffset + 1) * batchSize + gamesPerPage)),
+                setCurrentOffset(currentOffset + 1)
+              );
             }}
           >
             &gt;

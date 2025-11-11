@@ -35,8 +35,8 @@ def test_return_ten_games():
     conn.close()
     return jsonify(game_list)
 
-@app.route("/test_return_filtered_game_list")
-def test_full_game_item():
+@app.route("/test_return_filtered_game_list/<int:offset>", methods=["GET"])
+def test_full_game_item(offset):
     conn = psycopg2.connect (
         dbname = app.config["DBNAME"],
         user = app.config["DBUSER"],
@@ -45,7 +45,7 @@ def test_full_game_item():
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
-    games = helper.retrieve_game_info_with_filters(cursor, [31, 13, 14], [130, 167], 2)
+    games = helper.retrieve_game_info_with_filters(cursor, [31, 13, 14], [130, 167], offset)
     game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()
