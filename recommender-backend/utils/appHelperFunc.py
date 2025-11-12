@@ -99,3 +99,9 @@ def retrieve_certain_number_of_games(cursor, number):
     cursor.execute(game_info_query, (number,))
     games = cursor.fetchall()
     return retrieve_game_info(games)
+
+def retrieve_all_game_names(cursor):
+    game_info_query = "SELECT id, name FROM games;"
+    cursor.execute(game_info_query)
+    games = cursor.fetchall()
+    return games

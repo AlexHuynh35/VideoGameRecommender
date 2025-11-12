@@ -61,9 +61,10 @@ def test_full_game_list():
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
+    games = helper.retrieve_all_game_names(cursor)
     cursor.close()
     conn.close()
-    return "Video Game Recommender"
+    return jsonify(games)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
