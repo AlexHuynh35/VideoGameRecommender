@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { GameGallery } from "@/components";
+import { GameGallery, SearchBar } from "@/components";
 import { fetchGames } from "@/utilities/api";
 import { Game } from "@/test-data/test-data";
 
@@ -40,6 +40,8 @@ export default function Home() {
           Recommender
         </h1>
       </div>
+
+      <SearchBar />
 
       <div className="flex items-center justify-center gap-8">
         {currentOffset > 0 ? (
