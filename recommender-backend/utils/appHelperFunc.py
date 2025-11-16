@@ -105,3 +105,12 @@ def retrieve_all_game_names(cursor):
     cursor.execute(game_info_query)
     games = cursor.fetchall()
     return games
+
+def readable_game_tags(games):
+    game_tags = []
+    for game in games:
+        game_tags.append({
+            "id": game[0], 
+            "name": game[1]
+        })
+    return game_tags

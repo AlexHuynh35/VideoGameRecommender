@@ -62,9 +62,10 @@ def test_full_game_list():
     )
     cursor = conn.cursor()
     games = helper.retrieve_all_game_names(cursor)
+    game_tags = helper.readable_game_tags(games)
     cursor.close()
     conn.close()
-    return jsonify(games)
+    return jsonify(game_tags)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

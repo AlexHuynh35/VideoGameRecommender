@@ -48,8 +48,8 @@ export default function GamePopUp({ game }: GamePopUpProps) {
                     game={game}
                   />
                 </div>
-                <button className="absolute top-2 right-4 text-4xl text-gray-600 hover:text-black" onClick={() => setIsOpen(false)}>
-                  x
+                <button className="absolute top-2 right-4 text-2xl text-gray-600 hover:text-black" onClick={() => setIsOpen(false)}>
+                  ✕
                 </button>
               </div>
             </div>
