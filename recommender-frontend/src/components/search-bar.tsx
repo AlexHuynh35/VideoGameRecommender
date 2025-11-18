@@ -11,6 +11,7 @@ interface GameTag {
 
 export default function SearchBar() {
   const [query, setQuery] = useState<string>("");
+  const [active, setActive] = useState<boolean>(false);
   const [currentTags, setCurrentTags] = useState<GameTag[]>([]);
   const [suggestions, setSuggestions] = useState<GameTag[]>([]);
   const [allTags, setAllTags] = useState<GameTag[]>([]);
@@ -30,22 +31,31 @@ export default function SearchBar() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setSuggestions([]);
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setActive(false);
       }
     }
+
+    function handleClickInside(event: MouseEvent) {
+      if (wrapperRef.current && wrapperRef.current.contains(event.target as Node)) {
+        setActive(true);
+      }
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickInside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickInside);
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
 
-    if (value.length > 0) {
+    if (value.length > 0 && !loading && !error) {
       const matches = allTags.filter((tag) =>
         tag.name.toLowerCase().includes(value.toLowerCase())
       );
@@ -78,10 +88,6 @@ export default function SearchBar() {
   const removeTag = (id: number) => {
     setCurrentTags((prev) => prev.filter((t) => t.id !== id));
   };
-
-  if (loading) return <div></div>;
-
-  if (error) return <div></div>;
 
   return (
     <div className="max-w-4xl mx-auto flex flex-row items-center justify-center gap-8 my-12">
@@ -122,19 +128,31 @@ export default function SearchBar() {
           </div>
         </div>
 
-        {suggestions.length != 0 && (
-          <div className="absolute left-0 right-0 top-0 max-h-80 pt-20 -m-[4px] bg-neutral-200 border-4 border-orange-500 flex flex-col z-10">
-            {suggestions.map((tag) => (
-              <div
-                key={tag.id}
-                className="h-12 flex items-center text-lg text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200 hover:bg-neutral-100"
-                onClick={() => handleSelect(tag)}
-              >
-                {tag.name}
+        <div className="absolute left-0 right-0 top-0 max-h-82 pt-20 -m-[4px] bg-neutral-200 border-4 border-orange-500 z-10">
+          {active && (
+            loading ? (
+              query != "" && (
+                <div className="h-12 flex items-center text-lg text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200">Loading...</div>
+              )
+            ) : error ? (
+              query != "" && (
+                <div className="h-12 flex items-center text-lg text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200">Error: {error}</div>
+              )
+            ) : suggestions.length != 0 && (
+              <div className="flex flex-col">
+                {suggestions.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="h-12 flex items-center text-lg text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200 hover:bg-neutral-100"
+                    onClick={() => handleSelect(tag)}
+                  >
+                    {tag.name}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            )
+          )}
+        </div>
       </div>
 
       <div className="relative w-1/5 h-16">
