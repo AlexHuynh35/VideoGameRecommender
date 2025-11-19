@@ -31,95 +31,102 @@ export default function Home() {
   }, [totalOffsets]);
 
   return (
-    <section className="p-6">
-      <div className="max-w-7xl mx-auto my-12 text-center">
-        <h1 className="text-3xl sm:text-5xl md:text-7xl xl:text-8xl font-bold font-orbitron text-cyan-500">
-          Video Game
-        </h1>
-        <h1 className="text-4xl sm:text-6xl md:text-8xl xl:text-9xl font-bold font-orbitron text-cyan-500">
-          Recommender
-        </h1>
-      </div>
+    <section>
+      <nav className="fixed top-0 left-0 right-0 p-4 bg-neutral-800 border-b-8 border-neutral-900 z-20">
+        <div className="max-w-8xl mx-auto flex justify-between items-center gap-4">
+          <SearchBar />
+          <div className="">Filters</div>
+        </div>
+      </nav>
 
-      <SearchBar />
+      <div className="p-6 pt-24">
+        <div className="max-w-7xl mx-auto my-12 text-center">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl xl:text-8xl font-bold font-orbitron text-cyan-500">
+            Video Game
+          </h1>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl xl:text-9xl font-bold font-orbitron text-cyan-500">
+            Recommender
+          </h1>
+        </div>
 
-      <div className="flex items-center justify-center gap-8">
-        {currentOffset > 0 ? (
+        <div className="flex items-center justify-center gap-8">
+          {currentOffset > 0 ? (
+            <div className="relative w-14 h-14">
+              <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+              <div
+                className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
+                onClick={() => {
+                  setCurrentPage(4);
+                  setPaginatedGames(games.slice((currentOffset - 1) * batchSize + 3 * gamesPerPage, (currentOffset - 1) * batchSize + 4 * gamesPerPage));
+                  setCurrentOffset(currentOffset - 1);
+                }}
+              >
+                &lt;
+              </div>
+            </div>
+          ) : (
+            <div className="relative w-14 h-14">
+              <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+              <div className="absolute inset-0 flex items-center justify-center text-white font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-600">
+                &lt;
+              </div>
+            </div>
+          )}
+
+          {pageNumbers.map((page) => (
+            <div key={page} className="relative w-12 h-12">
+              <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
+              <div
+                className={`absolute inset-0 flex items-center justify-center font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-neutral-600 text-white" : "bg-neutral-200 text-black"}`}
+                onClick={() => {
+                  setCurrentPage(page);
+                  setPaginatedGames(games.slice(currentOffset * batchSize + (page - 1) * gamesPerPage, currentOffset * batchSize + page * gamesPerPage));
+                }}
+              >
+                {page + currentOffset * 4}
+              </div>
+            </div>
+          ))}
+
           <div className="relative w-14 h-14">
             <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
             <div
               className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
               onClick={() => {
-                setCurrentPage(4);
-                setPaginatedGames(games.slice((currentOffset - 1) * batchSize + 3 * gamesPerPage, (currentOffset - 1) * batchSize + 4 * gamesPerPage));
-                setCurrentOffset(currentOffset - 1);
+                currentOffset === totalOffsets ? (
+                  setLoading(true),
+                  setTotalOffsets(totalOffsets + 1),
+                  setCurrentOffset(currentOffset + 1)
+                ) : (
+                  setCurrentPage(1),
+                  setPaginatedGames(games.slice((currentOffset + 1) * batchSize, (currentOffset + 1) * batchSize + gamesPerPage)),
+                  setCurrentOffset(currentOffset + 1)
+                );
               }}
             >
-              &lt;
+              &gt;
             </div>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="max-w-7xl mx-auto my-12 text-center">
+            <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
+              Loading games...
+            </h1>
+          </div>
+        ) : error ? (
+          <div className="max-w-7xl mx-auto my-12 text-center">
+            <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
+              Error: {error}
+            </h1>
           </div>
         ) : (
-          <div className="relative w-14 h-14">
-            <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
-            <div className="absolute inset-0 flex items-center justify-center text-white font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-600">
-              &lt;
-            </div>
+          <div>
+            <GameGallery gameList={paginatedGames} />
           </div>
         )}
-
-        {pageNumbers.map((page) => (
-          <div key={page} className="relative w-12 h-12">
-            <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
-            <div
-              className={`absolute inset-0 flex items-center justify-center font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer ${page === currentPage ? "bg-neutral-600 text-white" : "bg-neutral-200 text-black"}`}
-              onClick={() => {
-                setCurrentPage(page);
-                setPaginatedGames(games.slice(currentOffset * batchSize + (page - 1) * gamesPerPage, currentOffset * batchSize + page * gamesPerPage));
-              }}
-            >
-              {page + currentOffset * 4}
-            </div>
-          </div>
-        ))}
-
-        <div className="relative w-14 h-14">
-          <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
-          <div
-            className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
-            onClick={() => {
-              currentOffset === totalOffsets ? (
-                setLoading(true),
-                setTotalOffsets(totalOffsets + 1),
-                setCurrentOffset(currentOffset + 1)
-              ) : (
-                setCurrentPage(1),
-                setPaginatedGames(games.slice((currentOffset + 1) * batchSize, (currentOffset + 1) * batchSize + gamesPerPage)),
-                setCurrentOffset(currentOffset + 1)
-              );
-            }}
-          >
-            &gt;
-          </div>
-        </div>
       </div>
-
-      {loading ? (
-        <div className="max-w-7xl mx-auto my-12 text-center">
-          <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
-            Loading games...
-          </h1>
-        </div>
-      ) : error ? (
-        <div className="max-w-7xl mx-auto my-12 text-center">
-          <h1 className="text-xl font-bold font-rajdhani text-cyan-500">
-            Error: {error}
-          </h1>
-        </div>
-      ) : (
-        <div>
-          <GameGallery gameList={paginatedGames} />
-        </div>
-      )}
     </section>
   );
 }
