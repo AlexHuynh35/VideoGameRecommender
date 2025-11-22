@@ -9,7 +9,13 @@ const gamesPerPage = 24;
 const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
+interface GameTag {
+  id: number;
+  name: string;
+}
+
 export default function Home() {
+  const [currentSearches, setCurrentSearches] = useState<GameTag[]>([]);
   const [currentOffset, setCurrentOffset] = useState<number>(0);
   const [totalOffsets, setTotalOffsets] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -34,7 +40,7 @@ export default function Home() {
     <section>
       <nav className="fixed top-0 left-0 right-0 p-4 bg-neutral-800 border-b-8 border-neutral-900 z-20">
         <div className="max-w-8xl mx-auto flex justify-between items-center gap-4">
-          <SearchBar />
+          <SearchBar onSearchSubmit={setCurrentSearches} />
           <div className="">Filters</div>
         </div>
       </nav>
@@ -47,6 +53,12 @@ export default function Home() {
           <h1 className="text-4xl sm:text-6xl md:text-8xl xl:text-9xl font-bold font-orbitron text-cyan-500">
             Recommender
           </h1>
+
+          {currentSearches.length != 0 && (
+            <div className="text-lg sm:text-2xl md:text-4xl xl:text-5xl font-bold font-rajdhani text-orange-500 pt-8">
+              Here are games similar to {currentSearches.map(tag => tag.name).join(", ")}!
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-center gap-8">

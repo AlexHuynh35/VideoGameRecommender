@@ -10,7 +10,11 @@ interface GameTag {
   name: string;
 }
 
-export default function SearchBar() {
+type SearchBarProps = {
+  onSearchSubmit: (tags: GameTag[]) => void;
+};
+
+export default function SearchBar({ onSearchSubmit }: SearchBarProps) {
   const [query, setQuery] = useState<string>("");
   const [active, setActive] = useState<boolean>(false);
   const [currentTags, setCurrentTags] = useState<GameTag[]>([]);
@@ -158,7 +162,10 @@ export default function SearchBar() {
 
       <div className="relative w-1/5 h-12">
         <div className="absolute inset-0 bg-neutral-700 -m-[5px]" />
-        <div className="absolute inset-0 flex items-center justify-center bg-neutral-200 text-md sm:text-xl text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer">
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-neutral-200 text-md sm:text-xl text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer"
+          onClick={() => onSearchSubmit(currentTags)}
+        >
           Search
         </div>
       </div>
