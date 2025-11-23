@@ -95,7 +95,7 @@ export default function SearchBar({ onSearchSubmit }: SearchBarProps) {
   };
 
   return (
-    <div className="w-80 sm:w-120 md:w-160 flex flex-row items-center justify-center gap-4">
+    <div className="w-80 lg:w-120 flex flex-row items-center justify-center gap-4">
       <div ref={wrapperRef} className="relative min-w-4/5 max-w-4/5 flex flex-col items-center px-6 bg-neutral-200 border-4 border-orange-500">
         <div className="w-full h-16 flex flex-row items-center gap-4 z-20">
           <Image
@@ -151,7 +151,7 @@ export default function SearchBar({ onSearchSubmit }: SearchBarProps) {
                     className="h-12 flex items-center text-lg text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200 hover:bg-neutral-100"
                     onClick={() => handleSelect(tag)}
                   >
-                    {truncate(tag.name, 50)}
+                    <span className="truncate">{tag.name}</span>
                   </div>
                 ))}
               </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { GameGallery, SearchBar } from "@/components";
+import { GameGallery, SearchBar, FilterDropdown } from "@/components";
 import { fetchGames } from "@/utilities/api";
 import { Game } from "@/test-data/test-data";
 
@@ -9,13 +9,15 @@ const gamesPerPage = 24;
 const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
-interface GameTag {
+interface Tag {
   id: number;
   name: string;
 }
 
 export default function Home() {
-  const [currentSearches, setCurrentSearches] = useState<GameTag[]>([]);
+  const [currentSearches, setCurrentSearches] = useState<Tag[]>([]);
+  const [currentGenres, setCurrentGenres] = useState<Tag[]>([]);
+  const [currentPlatforms, setCurrentPlatforms] = useState<Tag[]>([]);
   const [currentOffset, setCurrentOffset] = useState<number>(0);
   const [totalOffsets, setTotalOffsets] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -39,13 +41,18 @@ export default function Home() {
   return (
     <section>
       <nav className="fixed top-0 left-0 right-0 p-4 bg-neutral-800 border-b-8 border-neutral-900 z-20">
-        <div className="max-w-8xl mx-auto flex justify-between items-center gap-4">
-          <SearchBar onSearchSubmit={setCurrentSearches} />
-          <div className="">Filters</div>
+        <div className="max-w-8xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="z-30">
+            <SearchBar onSearchSubmit={setCurrentSearches} />
+          </div>
+          <div className="flex flex-row gap-4">
+            <FilterDropdown filterType="genre" onFilterSubmit={setCurrentGenres} />
+            <FilterDropdown filterType="platform" onFilterSubmit={setCurrentPlatforms} />
+          </div>
         </div>
       </nav>
 
-      <div className="p-6 pt-24">
+      <div className="p-6 pt-44 md:pt-24">
         <div className="max-w-7xl mx-auto my-12 text-center">
           <h1 className="text-3xl sm:text-5xl md:text-7xl xl:text-8xl font-bold font-orbitron text-cyan-500">
             Video Game
@@ -56,7 +63,7 @@ export default function Home() {
 
           {currentSearches.length != 0 && (
             <div className="text-lg sm:text-2xl md:text-4xl xl:text-5xl font-bold font-rajdhani text-orange-500 pt-8">
-              Here are games similar to {currentSearches.map(tag => tag.name).join(", ")}!
+              Here are games similar to {currentSearches.map(tag => tag.name).join(", ")}, filtered for the genres {currentGenres.map(tag => tag.name).join(", ")} and the platforms {currentPlatforms.map(tag => tag.name).join(", ")}!
             </div>
           )}
         </div>
