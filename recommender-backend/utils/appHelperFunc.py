@@ -106,11 +106,23 @@ def retrieve_all_game_names(cursor):
     games = cursor.fetchall()
     return games
 
-def readable_game_tags(games):
-    game_tags = []
-    for game in games:
-        game_tags.append({
-            "id": game[0], 
-            "name": game[1]
+def retrieve_all_genres(cursor):
+    genre_info_query = "SELECT id, name FROM genres;"
+    cursor.execute(genre_info_query)
+    genres = cursor.fetchall()
+    return genres
+
+def retrieve_all_platforms(cursor):
+    platform_info_query = "SELECT id, name FROM platforms;"
+    cursor.execute(platform_info_query)
+    platforms = cursor.fetchall()
+    return platforms
+
+def readable_tags(tags):
+    updated_tags = []
+    for tag in tags:
+        updated_tags.append({
+            "id": tag[0], 
+            "name": tag[1]
         })
-    return game_tags
+    return updated_tags

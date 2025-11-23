@@ -51,8 +51,8 @@ def test_full_game_item(offset):
     conn.close()
     return jsonify(game_list)
 
-@app.route("/test_full_game_list")
-def test_full_game_list():
+@app.route("/fetch_game_tags")
+def fetch_game_tags():
     conn = psycopg2.connect (
         dbname = app.config["DBNAME"],
         user = app.config["DBUSER"],
@@ -62,10 +62,42 @@ def test_full_game_list():
     )
     cursor = conn.cursor()
     games = helper.retrieve_all_game_names(cursor)
-    game_tags = helper.readable_game_tags(games)
+    game_tags = helper.readable_tags(games)
     cursor.close()
     conn.close()
     return jsonify(game_tags)
+
+@app.route("/fetch_genre_tags")
+def fetch_genre_tags():
+    conn = psycopg2.connect (
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
+    )
+    cursor = conn.cursor()
+    genres = helper.retrieve_all_genres(cursor)
+    genre_tags = helper.readable_tags(genres)
+    cursor.close()
+    conn.close()
+    return jsonify(genre_tags)
+
+@app.route("/fetch_platform_tags")
+def fetch_platform_tags():
+    conn = psycopg2.connect (
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
+    )
+    cursor = conn.cursor()
+    platforms = helper.retrieve_all_platforms(cursor)
+    platform_tags = helper.readable_tags(platforms)
+    cursor.close()
+    conn.close()
+    return jsonify(platform_tags)
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
