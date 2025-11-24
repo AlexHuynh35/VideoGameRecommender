@@ -18,6 +18,8 @@ export default function Home() {
   const [currentSearches, setCurrentSearches] = useState<Tag[]>([]);
   const [currentGenres, setCurrentGenres] = useState<Tag[]>([]);
   const [currentPlatforms, setCurrentPlatforms] = useState<Tag[]>([]);
+  const [isReset, setIsReset] = useState<boolean>(false);
+  const [queryVersion, setQueryVersion] = useState<number>(0);
   const [currentOffset, setCurrentOffset] = useState<number>(0);
   const [totalOffsets, setTotalOffsets] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -27,16 +29,29 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGames(totalOffsets).then((data) => {
-      setGames(games.concat(data));
+    setLoading(true);
+    setIsReset(true);
+    setQueryVersion(queryVersion + 1)
+    setCurrentOffset(0);
+    setTotalOffsets(0);
+  }, [currentGenres, currentPlatforms]);
+
+  useEffect(() => {
+    fetchGames(totalOffsets, currentGenres.map(genre => genre.id), currentPlatforms.map(platform => platform.id)).then((data) => {
+      if (isReset) {
+        setGames(data);
+      } else {
+        setGames(games.concat(data));
+      }
       setCurrentPage(1);
       setPaginatedGames(data.slice(0, gamesPerPage));
       setLoading(false);
+      setIsReset(false);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, [totalOffsets]);
+  }, [totalOffsets, queryVersion]);
 
   return (
     <section>

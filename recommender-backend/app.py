@@ -1,6 +1,6 @@
 import psycopg2
 import utils.appHelperFunc as helper
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -35,8 +35,16 @@ def test_return_ten_games():
     conn.close()
     return jsonify(game_list)
 
-@app.route("/test_return_filtered_game_list/<int:offset>", methods=["GET"])
-def test_full_game_item(offset):
+@app.route("/test_return_filtered_game_list", methods=["GET"])
+def test_full_game_item():
+    offset = request.args.get("offset", type=int)
+    genres = request.args.get("genres", "", type=str)
+    platforms = request.args.get("platforms", "", type=str)
+    genre_array = genres.split(",") if genres else ["32"]
+    platform_array = platforms.split(",") if platforms else ["34"]
+    genre_int_array = [int(x) for x in genre_array]
+    platform_int_array = [int(x) for x in platform_array]
+
     conn = psycopg2.connect (
         dbname = app.config["DBNAME"],
         user = app.config["DBUSER"],
@@ -45,7 +53,7 @@ def test_full_game_item(offset):
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
-    games = helper.retrieve_game_info_with_filters(cursor, [31, 13, 14], [130, 167], offset)
+    games = helper.retrieve_game_info_with_filters(cursor, genre_int_array, platform_int_array, offset)
     game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()
