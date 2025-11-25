@@ -9,19 +9,28 @@ const gamesPerPage = 24;
 const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
+
 interface Tag {
   id: number;
   name: string;
 }
 
+interface Query {
+  games: Tag[];
+  genres: Tag[];
+  platforms: Tag[];
+  totalOffsets: number;
+}
+
 export default function Home() {
-  const [currentSearches, setCurrentSearches] = useState<Tag[]>([]);
-  const [currentGenres, setCurrentGenres] = useState<Tag[]>([]);
-  const [currentPlatforms, setCurrentPlatforms] = useState<Tag[]>([]);
+  const [currentQuery, setCurrentQuery] = useState<Query>({
+    games: [],
+    genres: [],
+    platforms: [],
+    totalOffsets: 0
+  });
   const [isReset, setIsReset] = useState<boolean>(false);
-  const [queryVersion, setQueryVersion] = useState<number>(0);
   const [currentOffset, setCurrentOffset] = useState<number>(0);
-  const [totalOffsets, setTotalOffsets] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [games, setGames] = useState<Game[]>([]);
   const [paginatedGames, setPaginatedGames] = useState<Game[]>([]);
@@ -29,29 +38,67 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setIsReset(true);
-    setQueryVersion(queryVersion + 1)
-    setCurrentOffset(0);
-    setTotalOffsets(0);
-  }, [currentGenres, currentPlatforms]);
-
-  useEffect(() => {
-    fetchGames(totalOffsets, currentGenres.map(genre => genre.id), currentPlatforms.map(platform => platform.id)).then((data) => {
+    fetchGames(currentQuery.totalOffsets, currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id)).then((data) => {
       if (isReset) {
         setGames(data);
+        setIsReset(false);
       } else {
         setGames(games.concat(data));
       }
       setCurrentPage(1);
       setPaginatedGames(data.slice(0, gamesPerPage));
       setLoading(false);
-      setIsReset(false);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, [totalOffsets, queryVersion]);
+  }, [currentQuery]);
+
+  const resetQuery = () => {
+    setLoading(true);
+    setIsReset(true);
+    setCurrentOffset(0);
+  }
+
+  const setCurrentSearches = (newSearches: Tag[]) => {
+    resetQuery();
+    setCurrentQuery({
+      games: newSearches,
+      genres: currentQuery.genres,
+      platforms: currentQuery.platforms,
+      totalOffsets: 0
+    });
+  }
+
+  const setCurrentGenres = (newGenres: Tag[]) => {
+    resetQuery();
+    setCurrentQuery({
+      games: currentQuery.games,
+      genres: newGenres,
+      platforms: currentQuery.platforms,
+      totalOffsets: 0
+    })
+  }
+
+  const setCurrentPlatforms = (newPlatforms: Tag[]) => {
+    resetQuery();
+    setCurrentQuery({
+      games: currentQuery.games,
+      genres: currentQuery.genres,
+      platforms: newPlatforms,
+      totalOffsets: 0
+    })
+  }
+
+  const setTotalOffsets = (offset: number) => {
+    setLoading(true);
+    setCurrentQuery({
+      games: currentQuery.games,
+      genres: currentQuery.genres,
+      platforms: currentQuery.platforms,
+      totalOffsets: offset
+    })
+  }
 
   return (
     <section>
@@ -76,9 +123,9 @@ export default function Home() {
             Recommender
           </h1>
 
-          {currentSearches.length != 0 && (
+          {currentQuery.games.length != 0 && (
             <div className="text-lg sm:text-2xl md:text-4xl xl:text-5xl font-bold font-rajdhani text-orange-500 pt-8">
-              Here are games similar to {currentSearches.map(tag => tag.name).join(", ")}, filtered for the genres {currentGenres.map(tag => tag.name).join(", ")} and the platforms {currentPlatforms.map(tag => tag.name).join(", ")}!
+              Here are games similar to {currentQuery.games.map(tag => tag.name).join(", ")}, filtered for the genres {currentQuery.genres.map(tag => tag.name).join(", ")} and the platforms {currentQuery.platforms.map(tag => tag.name).join(", ")}!
             </div>
           )}
         </div>
@@ -127,9 +174,9 @@ export default function Home() {
             <div
               className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
               onClick={() => {
-                currentOffset === totalOffsets ? (
+                currentOffset === currentQuery.totalOffsets ? (
                   setLoading(true),
-                  setTotalOffsets(totalOffsets + 1),
+                  setTotalOffsets(currentQuery.totalOffsets + 1),
                   setCurrentOffset(currentOffset + 1)
                 ) : (
                   setCurrentPage(1),
