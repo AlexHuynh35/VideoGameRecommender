@@ -46,10 +46,24 @@ def retrieve_game_info(cursor, games):
     return games_with_all_info
 
 def retrieve_game_info_with_filters(cursor, genres, platforms, page):
-    genre_placeholders = ','.join(['%s'] * len(genres))
-    platform_placeholders = ','.join(['%s'] * len(platforms))
-    
-    game_info_query = f"""
+    params = []
+    where_clauses = []
+
+    if genres:
+        placeholders = ','.join(['%s'] * len(genres))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(genres)
+
+    if platforms:
+        placeholders = ','.join(['%s'] * len(platforms))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
+        params.extend(platforms)
+
+    where_sql = ""
+    if where_clauses:
+        where_sql = "WHERE " + " AND ".join(where_clauses)
+
+    query = f"""
     SELECT
         ga.id,
         ga.name,
@@ -66,18 +80,16 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, page):
     LEFT JOIN platforms AS pl ON gp.platform_id = pl.id
     LEFT JOIN game_companies AS gc ON ga.id = gc.game_id
     LEFT JOIN companies AS co ON gc.company_id = co.id
-    WHERE
-        ga.id NOT IN (SELECT game_id FROM game_genres WHERE genre_id IN ({genre_placeholders}))
-        AND ga.id NOT IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({platform_placeholders}))
+    {where_sql}
     GROUP BY ga.id
     LIMIT 96
     OFFSET %s;
     """
 
-    params = tuple(genres + platforms + [page * 96])
-    cursor.execute(game_info_query, params)
-    games = cursor.fetchall()
-    return games
+    params.append(page * 96)
+
+    cursor.execute(query, tuple(params))
+    return cursor.fetchall()
 
 def readable_game_list(games):
     game_list = []

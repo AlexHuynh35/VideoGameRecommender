@@ -35,13 +35,13 @@ def test_return_ten_games():
     conn.close()
     return jsonify(game_list)
 
-@app.route("/test_return_filtered_game_list", methods=["GET"])
-def test_full_game_item():
+@app.route("/fetch_filtered_game_list", methods=["GET"])
+def fetch_filtered_game_list():
     offset = request.args.get("offset", type=int)
     genres = request.args.get("genres", "", type=str)
     platforms = request.args.get("platforms", "", type=str)
-    genre_array = genres.split(",") if genres else ["32"]
-    platform_array = platforms.split(",") if platforms else ["34"]
+    genre_array = genres.split(",") if genres else []
+    platform_array = platforms.split(",") if platforms else []
     genre_int_array = [int(x) for x in genre_array]
     platform_int_array = [int(x) for x in platform_array]
 

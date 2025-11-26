@@ -90,7 +90,7 @@ export default function FilterDropdown({ filterType, onFilterSubmit }: FilterDro
                   <label key={filter.id} className="h-8 flex items-center text-md text-black font-rajdhani font-semibold px-2 py-2 bg-neutral-200">
                     <input
                       type="checkbox"
-                      checked={!currentTags.some(f => f.id === filter.id)}
+                      checked={currentTags.some(f => f.id === filter.id)}
                       onChange={() => toggleSelect(filter)}
                     />
                     <span className="pl-2 truncate">{filter.name}</span>
