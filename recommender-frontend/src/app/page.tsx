@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { GameGallery, SearchBar, FilterDropdown } from "@/components";
+import { GameGallery, SearchBar, FilterDropdown, SortDropdown } from "@/components";
 import { fetchGames } from "@/utilities/api";
 import { Game } from "@/test-data/test-data";
 
@@ -9,6 +9,7 @@ const gamesPerPage = 24;
 const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
+type SortType = "name" | "rating" | "similarity";
 
 interface Tag {
   id: number;
@@ -19,6 +20,7 @@ interface Query {
   games: Tag[];
   genres: Tag[];
   platforms: Tag[];
+  sortType: SortType;
   totalOffsets: number;
 }
 
@@ -27,6 +29,7 @@ export default function Home() {
     games: [],
     genres: [],
     platforms: [],
+    sortType: "name",
     totalOffsets: 0
   });
   const [isReset, setIsReset] = useState<boolean>(false);
@@ -66,6 +69,7 @@ export default function Home() {
       games: newSearches,
       genres: currentQuery.genres,
       platforms: currentQuery.platforms,
+      sortType: currentQuery.sortType,
       totalOffsets: 0
     });
   }
@@ -76,6 +80,7 @@ export default function Home() {
       games: currentQuery.games,
       genres: newGenres,
       platforms: currentQuery.platforms,
+      sortType: currentQuery.sortType,
       totalOffsets: 0
     })
   }
@@ -86,6 +91,18 @@ export default function Home() {
       games: currentQuery.games,
       genres: currentQuery.genres,
       platforms: newPlatforms,
+      sortType: currentQuery.sortType,
+      totalOffsets: 0
+    })
+  }
+
+  const setCurrentSortType = (newSortType: SortType) => {
+    resetQuery();
+    setCurrentQuery({
+      games: currentQuery.games,
+      genres: currentQuery.genres,
+      platforms: currentQuery.platforms,
+      sortType: newSortType,
       totalOffsets: 0
     })
   }
@@ -96,6 +113,7 @@ export default function Home() {
       games: currentQuery.games,
       genres: currentQuery.genres,
       platforms: currentQuery.platforms,
+      sortType: currentQuery.sortType,
       totalOffsets: offset
     })
   }
@@ -110,6 +128,7 @@ export default function Home() {
           <div className="flex flex-row gap-4">
             <FilterDropdown filterType="genre" onFilterSubmit={setCurrentGenres} />
             <FilterDropdown filterType="platform" onFilterSubmit={setCurrentPlatforms} />
+            <SortDropdown onSortSubmit={setCurrentSortType}/>
           </div>
         </div>
       </nav>
@@ -125,7 +144,7 @@ export default function Home() {
 
           {currentQuery.games.length != 0 && (
             <div className="text-lg sm:text-2xl md:text-4xl xl:text-5xl font-bold font-rajdhani text-orange-500 pt-8">
-              Here are games similar to {currentQuery.games.map(tag => tag.name).join(", ")}, filtered for the genres {currentQuery.genres.map(tag => tag.name).join(", ")} and the platforms {currentQuery.platforms.map(tag => tag.name).join(", ")}!
+              Here are games similar to {currentQuery.games.map(tag => tag.name).join(", ")}, filtered for the genres {currentQuery.genres.map(tag => tag.name).join(", ")} and the platforms {currentQuery.platforms.map(tag => tag.name).join(", ")}, sorted by {currentQuery.sortType}!
             </div>
           )}
         </div>
