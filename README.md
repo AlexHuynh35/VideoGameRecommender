@@ -22,7 +22,7 @@ This full-stack web application uses a content-based video game recommendation s
 
 - **Game Search & Filters**: users can enter a game they like and apply filters (genre and platform) to discover similar titles.
 
-- **Game Details Page**: each game links to a detail view with expanded information (developer, cover art, rating, release date, etc.).
+- **Game Details Popup**: each game opens a detailed view with expanded information (developer, cover art, rating, release date, etc.).
 
 ---
 
@@ -30,7 +30,7 @@ This full-stack web application uses a content-based video game recommendation s
 
 | Category            | Tools / Frameworks                                 |
 |---------------------|----------------------------------------------------|
-| **Frontend**        | React (Vite), TypeScript, TailwindCSS              |
+| **Frontend**        | React (Next.js), TypeScript, TailwindCSS           |
 | **Backend**         | Python, Flask, PostgreSQL                          |
 | **Version Control** | Git + GitHub                                       |
 
@@ -39,12 +39,12 @@ This full-stack web application uses a content-based video game recommendation s
 ## Design Notes
 
 - **Color Palette**:
-  - Primary: #1e3a8a (Navy Blue)
-  - Accent Colors: #f3f4f6 (Light Gray), #60a5fa (Sky Blue)
+  - Primary: Cyan
+  - Accent Colors: Orange, Slate, Gray
 
 - **Mobile Friendliness**:
   - Fully responsive layout
-  - Touch-friendly navigation and image scaling
+  - Touch-friendly navigation
 
 ---
 
@@ -59,5 +59,5 @@ This full-stack web application uses a content-based video game recommendation s
 ## Status
 
 **Actively in development**
-- First release targeted: October 1st, 2025
+- First release targeted: December 15th, 2025
 - Check back for live demo and updates!
