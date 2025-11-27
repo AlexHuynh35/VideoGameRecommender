@@ -1,5 +1,5 @@
-export async function fetchGames(offset: number, genres: number[], platforms: number[]) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fetch_filtered_game_list?offset=${offset}&genres=${genres.join(",")}&platforms=${platforms.join(",")}`);
+export async function fetchGames(offset: number, genres: number[], platforms: number[], sortType: string) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fetch_filtered_game_list?offset=${offset}&genres=${genres.join(",")}&platforms=${platforms.join(",")}&sort=${sortType}`);
   if (!response.ok) {
     throw new Error("Failed to fetch games");
   }

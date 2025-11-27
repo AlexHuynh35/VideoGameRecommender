@@ -45,7 +45,7 @@ def retrieve_game_info(cursor, games):
         games_with_all_info.append(game + (game_genres, game_platforms, game_companies))
     return games_with_all_info
 
-def retrieve_game_info_with_filters(cursor, genres, platforms, page):
+def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     params = []
     where_clauses = []
 
@@ -62,6 +62,12 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, page):
     where_sql = ""
     if where_clauses:
         where_sql = "WHERE " + " AND ".join(where_clauses)
+
+    order_sql = ""
+    if sort_type == "name":
+        order_sql = "ORDER BY ga.name ASC"
+    elif sort_type == "rating":
+        order_sql = "ORDER BY ga.rating DESC"
 
     query = f"""
     SELECT
@@ -82,6 +88,7 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, page):
     LEFT JOIN companies AS co ON gc.company_id = co.id
     {where_sql}
     GROUP BY ga.id
+    {order_sql}
     LIMIT 96
     OFFSET %s;
     """

@@ -40,6 +40,7 @@ def fetch_filtered_game_list():
     offset = request.args.get("offset", type=int)
     genres = request.args.get("genres", "", type=str)
     platforms = request.args.get("platforms", "", type=str)
+    sort_type = request.args.get("sort", "name", type=str)
     genre_array = genres.split(",") if genres else []
     platform_array = platforms.split(",") if platforms else []
     genre_int_array = [int(x) for x in genre_array]
@@ -53,7 +54,7 @@ def fetch_filtered_game_list():
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
-    games = helper.retrieve_game_info_with_filters(cursor, genre_int_array, platform_int_array, offset)
+    games = helper.retrieve_game_info_with_filters(cursor, genre_int_array, platform_int_array, sort_type, offset)
     game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()

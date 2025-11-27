@@ -9,8 +9,6 @@ const gamesPerPage = 24;
 const batchSize = gamesPerPage * 4;
 const pageNumbers = [1, 2, 3, 4];
 
-type SortType = "name" | "rating" | "similarity";
-
 interface Tag {
   id: number;
   name: string;
@@ -20,7 +18,7 @@ interface Query {
   games: Tag[];
   genres: Tag[];
   platforms: Tag[];
-  sortType: SortType;
+  sortType: string;
   totalOffsets: number;
 }
 
@@ -41,7 +39,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchGames(currentQuery.totalOffsets, currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id)).then((data) => {
+    fetchGames(currentQuery.totalOffsets, currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
       if (isReset) {
         setGames(data);
         setIsReset(false);
@@ -96,7 +94,7 @@ export default function Home() {
     })
   }
 
-  const setCurrentSortType = (newSortType: SortType) => {
+  const setCurrentSortType = (newSortType: string) => {
     resetQuery();
     setCurrentQuery({
       games: currentQuery.games,
