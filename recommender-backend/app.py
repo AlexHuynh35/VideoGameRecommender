@@ -60,6 +60,28 @@ def fetch_filtered_game_list():
     conn.close()
     return jsonify(game_list)
 
+@app.route("/fetch_filtered_game_list_size", methods=["GET"])
+def fetch_filtered_game_list_size():
+    genres = request.args.get("genres", "", type=str)
+    platforms = request.args.get("platforms", "", type=str)
+    genre_array = genres.split(",") if genres else []
+    platform_array = platforms.split(",") if platforms else []
+    genre_int_array = [int(x) for x in genre_array]
+    platform_int_array = [int(x) for x in platform_array]
+
+    conn = psycopg2.connect (
+        dbname = app.config["DBNAME"],
+        user = app.config["DBUSER"],
+        password = app.config["DBPASS"],
+        host = app.config["DBHOST"],
+        port = app.config["DBPORT"]
+    )
+    cursor = conn.cursor()
+    num_games = len(helper.retrieve_simplified_game_info_with_filters(cursor, genre_int_array, platform_int_array))
+    cursor.close()
+    conn.close()
+    return jsonify(num_games)
+
 @app.route("/fetch_game_tags")
 def fetch_game_tags():
     conn = psycopg2.connect (

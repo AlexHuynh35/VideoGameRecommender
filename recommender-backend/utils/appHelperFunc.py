@@ -98,6 +98,36 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     cursor.execute(query, tuple(params))
     return cursor.fetchall()
 
+def retrieve_simplified_game_info_with_filters(cursor, genres, platforms):
+    params = []
+    where_clauses = []
+
+    if genres:
+        placeholders = ','.join(['%s'] * len(genres))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(genres)
+
+    if platforms:
+        placeholders = ','.join(['%s'] * len(platforms))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
+        params.extend(platforms)
+
+    where_sql = ""
+    if where_clauses:
+        where_sql = "WHERE " + " AND ".join(where_clauses)
+
+    query = f"""
+    SELECT
+        ga.id,
+        ga.name
+    FROM games AS ga
+    {where_sql}
+    GROUP BY ga.id
+    """
+
+    cursor.execute(query, tuple(params))
+    return cursor.fetchall()
+
 def readable_game_list(games):
     game_list = []
     for game in games:
