@@ -43,7 +43,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isReset) {
-      fetchSize(currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id)).then((data) => {
+      fetchSize(currentQuery.games.map(game => game.id), currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id)).then((data) => {
         setTotalSize(data);
         setLastOffset(Math.floor(data / batchSize));
         setLastPage(data < batchSize ? Math.ceil(data / gamesPerPage) : 4);
@@ -52,7 +52,7 @@ export default function Home() {
         setLoading(false);
       });
 
-      fetchGames(currentQuery.totalOffsets, currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
+      fetchGames(currentQuery.totalOffsets, currentQuery.games.map(game => game.id), currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
         setGames(data);
         setPaginatedGames(data.slice(0, gamesPerPage));
         setLoading(false);
@@ -63,7 +63,7 @@ export default function Home() {
 
       setIsReset(false);
     } else {
-      fetchGames(currentQuery.totalOffsets, currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
+      fetchGames(currentQuery.totalOffsets, currentQuery.games.map(game => game.id), currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
         setGames(games.concat(data));
         setPaginatedGames(data.slice(0, gamesPerPage));
         setLastPage(data.length < batchSize ? Math.ceil(data.length / gamesPerPage) : 4);

@@ -1,3 +1,11 @@
+# Test Functions
+
+def retrieve_certain_number_of_games(cursor, number):
+    game_info_query = "SELECT id, name, first_release_date, rating, cover_url FROM games LIMIT %s;"
+    cursor.execute(game_info_query, (number,))
+    games = cursor.fetchall()
+    return retrieve_game_info(games)
+
 def retrieve_game_info(cursor, games):
     game_id_list = [games[0] for game in games]
 
@@ -44,6 +52,8 @@ def retrieve_game_info(cursor, games):
         game_companies = company_dict.get(game[0], [])
         games_with_all_info.append(game + (game_genres, game_platforms, game_companies))
     return games_with_all_info
+
+# Main Retrieval Functions
 
 def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     params = []
@@ -98,6 +108,8 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     cursor.execute(query, tuple(params))
     return cursor.fetchall()
 
+# Helper Retrieval Functions
+
 def retrieve_simplified_game_info_with_filters(cursor, genres, platforms):
     params = []
     where_clauses = []
@@ -128,27 +140,6 @@ def retrieve_simplified_game_info_with_filters(cursor, genres, platforms):
     cursor.execute(query, tuple(params))
     return cursor.fetchall()
 
-def readable_game_list(games):
-    game_list = []
-    for game in games:
-        game_list.append({
-            "id": game[0], 
-            "name": game[1],
-            "firstReleaseDate": game[2], 
-            "rating": game[3], 
-            "coverUrl": game[4],
-            "genres": game[5],
-            "platforms": game[6],
-            "companies": game[7]
-        })
-    return game_list
-
-def retrieve_certain_number_of_games(cursor, number):
-    game_info_query = "SELECT id, name, first_release_date, rating, cover_url FROM games LIMIT %s;"
-    cursor.execute(game_info_query, (number,))
-    games = cursor.fetchall()
-    return retrieve_game_info(games)
-
 def retrieve_all_game_names(cursor):
     game_info_query = "SELECT id, name FROM games;"
     cursor.execute(game_info_query)
@@ -166,6 +157,42 @@ def retrieve_all_platforms(cursor):
     cursor.execute(platform_info_query)
     platforms = cursor.fetchall()
     return platforms
+
+def retrieve_genres_and_platforms(cursor, games):
+    if games:
+        where_sql = f"WHERE ga.id IN ({','.join(['%s'] * len(games))})"
+        query = f"""
+        SELECT
+            ARRAY_AGG(DISTINCT ge.id) AS genres,
+            ARRAY_AGG(DISTINCT pl.id) AS platforms
+        FROM games AS ga
+        LEFT JOIN game_genres AS gg ON ga.id = gg.game_id
+        LEFT JOIN genres AS ge ON gg.genre_id = ge.id
+        LEFT JOIN game_platforms AS gp ON ga.id = gp.game_id
+        LEFT JOIN platforms AS pl ON gp.platform_id = pl.id
+        {where_sql}
+        """
+        cursor.execute(query, games)
+        genres_and_platforms = cursor.fetchone()
+        return [list(genres_and_platforms[0]), list(genres_and_platforms[1])]
+    return [[], []]
+
+# Readability Functions
+
+def readable_game_list(games):
+    game_list = []
+    for game in games:
+        game_list.append({
+            "id": game[0], 
+            "name": game[1],
+            "firstReleaseDate": game[2], 
+            "rating": game[3], 
+            "coverUrl": game[4],
+            "genres": game[5],
+            "platforms": game[6],
+            "companies": game[7]
+        })
+    return game_list
 
 def readable_tags(tags):
     updated_tags = []
