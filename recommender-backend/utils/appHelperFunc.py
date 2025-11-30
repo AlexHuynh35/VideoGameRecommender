@@ -77,7 +77,7 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     if sort_type == "name":
         order_sql = "ORDER BY ga.name ASC"
     elif sort_type == "rating":
-        order_sql = "ORDER BY ga.rating DESC"
+        order_sql = "ORDER BY ga.rating DESC NULLS LAST"
 
     query = f"""
     SELECT
