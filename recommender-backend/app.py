@@ -57,8 +57,8 @@ def fetch_filtered_game_list():
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
-    genres_and_platforms = helper.retrieve_genres_and_platforms(cursor, game_int_array)
-    games = helper.retrieve_game_info_with_filters(cursor, list(set(genre_int_array + genres_and_platforms[0])), list(set(platform_int_array + genres_and_platforms[1])), sort_type, offset)
+    search_genres_and_platforms = helper.retrieve_genres_and_platforms(cursor, game_int_array)
+    games = helper.retrieve_game_info_with_filters(cursor, search_genres_and_platforms[0], genre_int_array, search_genres_and_platforms[1], platform_int_array, sort_type, offset)
     game_list = helper.readable_game_list(games)
     cursor.close()
     conn.close()
@@ -84,8 +84,8 @@ def fetch_filtered_game_list_size():
         port = app.config["DBPORT"]
     )
     cursor = conn.cursor()
-    genres_and_platforms = helper.retrieve_genres_and_platforms(cursor, game_int_array)
-    num_games = len(helper.retrieve_simplified_game_info_with_filters(cursor, list(set(genre_int_array + genres_and_platforms[0])), list(set(platform_int_array + genres_and_platforms[1]))))
+    search_genres_and_platforms = helper.retrieve_genres_and_platforms(cursor, game_int_array)
+    num_games = len(helper.retrieve_simplified_game_info_with_filters(cursor, search_genres_and_platforms[0], genre_int_array, search_genres_and_platforms[1], platform_int_array))
     cursor.close()
     conn.close()
     return jsonify(num_games)

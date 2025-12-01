@@ -55,19 +55,34 @@ def retrieve_game_info(cursor, games):
 
 # Main Retrieval Functions
 
-def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
+def retrieve_game_info_with_filters(cursor, search_genres, filter_genres, search_platforms, filter_platforms, sort_type, page):
     params = []
+    search_clauses = []
     where_clauses = []
 
-    if genres:
-        placeholders = ','.join(['%s'] * len(genres))
-        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
-        params.extend(genres)
+    if search_genres:
+        placeholders = ','.join(['%s'] * len(search_genres))
+        search_clauses.append(f"id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(search_genres)
 
-    if platforms:
-        placeholders = ','.join(['%s'] * len(platforms))
+    if search_platforms:
+        placeholders = ','.join(['%s'] * len(search_platforms))
+        search_clauses.append(f"id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
+        params.extend(search_platforms)
+
+    search_sql = ""
+    if search_clauses:
+        search_sql = "WHERE " + " AND ".join(search_clauses)
+
+    if filter_genres:
+        placeholders = ','.join(['%s'] * len(filter_genres))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(filter_genres)
+
+    if filter_platforms:
+        placeholders = ','.join(['%s'] * len(filter_platforms))
         where_clauses.append(f"ga.id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
-        params.extend(platforms)
+        params.extend(filter_platforms)
 
     where_sql = ""
     if where_clauses:
@@ -80,6 +95,11 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
         order_sql = "ORDER BY ga.rating DESC NULLS LAST"
 
     query = f"""
+    WITH filtered_games AS (
+        SELECT *
+        FROM games
+        {search_sql}
+    )
     SELECT
         ga.id,
         ga.name,
@@ -89,7 +109,7 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
         ARRAY_AGG(DISTINCT ge.name) AS genres,
         ARRAY_AGG(DISTINCT pl.name) AS platforms,
         ARRAY_AGG(DISTINCT co.name) AS companies
-    FROM games AS ga
+    FROM filtered_games AS ga
     LEFT JOIN game_genres AS gg ON ga.id = gg.game_id
     LEFT JOIN genres AS ge ON gg.genre_id = ge.id
     LEFT JOIN game_platforms AS gp ON ga.id = gp.game_id
@@ -97,7 +117,7 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
     LEFT JOIN game_companies AS gc ON ga.id = gc.game_id
     LEFT JOIN companies AS co ON gc.company_id = co.id
     {where_sql}
-    GROUP BY ga.id
+    GROUP BY ga.id, ga.name, ga.first_release_date, ga.rating, ga.cover_url
     {order_sql}
     LIMIT 96
     OFFSET %s;
@@ -110,31 +130,51 @@ def retrieve_game_info_with_filters(cursor, genres, platforms, sort_type, page):
 
 # Helper Retrieval Functions
 
-def retrieve_simplified_game_info_with_filters(cursor, genres, platforms):
+def retrieve_simplified_game_info_with_filters(cursor, search_genres, filter_genres, search_platforms, filter_platforms):
     params = []
+    search_clauses =[]
     where_clauses = []
 
-    if genres:
-        placeholders = ','.join(['%s'] * len(genres))
-        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
-        params.extend(genres)
+    if search_genres:
+        placeholders = ','.join(['%s'] * len(search_genres))
+        search_clauses.append(f"id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(search_genres)
 
-    if platforms:
-        placeholders = ','.join(['%s'] * len(platforms))
+    if search_platforms:
+        placeholders = ','.join(['%s'] * len(search_platforms))
+        search_clauses.append(f"id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
+        params.extend(search_platforms)
+
+    search_sql = ""
+    if search_clauses:
+        search_sql = "WHERE " + " AND ".join(search_clauses)
+
+    if filter_genres:
+        placeholders = ','.join(['%s'] * len(filter_genres))
+        where_clauses.append(f"ga.id IN (SELECT game_id FROM game_genres WHERE genre_id IN ({placeholders}))")
+        params.extend(filter_genres)
+
+    if filter_platforms:
+        placeholders = ','.join(['%s'] * len(filter_platforms))
         where_clauses.append(f"ga.id IN (SELECT game_id FROM game_platforms WHERE platform_id IN ({placeholders}))")
-        params.extend(platforms)
+        params.extend(filter_platforms)
 
     where_sql = ""
     if where_clauses:
         where_sql = "WHERE " + " AND ".join(where_clauses)
 
     query = f"""
+    WITH filtered_games AS (
+        SELECT *
+        FROM games
+        {search_sql}
+    )
     SELECT
         ga.id,
         ga.name
-    FROM games AS ga
+    FROM filtered_games AS ga
     {where_sql}
-    GROUP BY ga.id
+    GROUP BY ga.id, ga.name
     """
 
     cursor.execute(query, tuple(params))
