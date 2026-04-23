@@ -26,7 +26,7 @@ export default function FilterDropdown({ filterType, onFilterSubmit }: FilterDro
   useEffect(() => {
     if (filterType == "genre") {
       fetchAllGenres().then((data) => {
-        setAllTags(allTags.concat(data));
+        setAllTags(allTags => allTags.concat(data));
         setLoading(false);
       }).catch((err) => {
         setError(err.message);
@@ -34,7 +34,7 @@ export default function FilterDropdown({ filterType, onFilterSubmit }: FilterDro
       });
     } else if (filterType == "platform") {
       fetchAllPlatforms().then((data) => {
-        setAllTags(allTags.concat(data));
+        setAllTags(allTags => allTags.concat(data));
         setLoading(false);
       }).catch((err) => {
         setError(err.message);

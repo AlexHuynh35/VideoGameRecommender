@@ -47,8 +47,8 @@ export default function GameDisplay({ game }: GameDisplayProps) {
         </div>
 
         <div className="absolute top-3 right-3 w-1/4 aspect-[1/1] flex items-center justify-center">
-          <div className="absolute inset-0 -m-[10px] bg-yellow-500 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)]" />
-          <div className="absolute inset-0 bg-yellow-400 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)] z-10" />
+          <div className="absolute inset-0 -m-[10px] bg-yellow-500 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)] [transform:translateZ(0)] transform-gpu will-change-transform" />
+          <div className="absolute inset-0 bg-yellow-400 [clip-path:polygon(50%_5%,65%_35%,98%_38%,75%_60%,82%_92%,50%_75%,18%_92%,25%_60%,2%_38%,35%_35%)] [transform:translateZ(0)] transform-gpu will-change-transform z-10" />
           <h1 className="text-lg font-bold font-orbiton text-black pt-1 z-20">{Math.round(game.rating)}</h1>
         </div>
       </div>

@@ -26,7 +26,7 @@ export default function SearchBar({ onSearchSubmit }: SearchBarProps) {
 
   useEffect(() => {
     fetchAllGameNames().then((data) => {
-      setAllTags(allTags.concat(data));
+      setAllTags(allTags => allTags.concat(data));
       setLoading(false);
     }).catch((err) => {
       setError(err.message);

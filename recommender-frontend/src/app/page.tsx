@@ -64,7 +64,7 @@ export default function Home() {
       setIsReset(false);
     } else {
       fetchGames(currentQuery.totalOffsets, currentQuery.games.map(game => game.id), currentQuery.genres.map(genre => genre.id), currentQuery.platforms.map(platform => platform.id), currentQuery.sortType).then((data) => {
-        setGames(games.concat(data));
+        setGames(games => games.concat(data));
         setPaginatedGames(data.slice(0, gamesPerPage));
         setLastPage(data.length < batchSize ? Math.ceil(data.length / gamesPerPage) : 4);
         setLoading(false);
@@ -216,16 +216,16 @@ export default function Home() {
               <div
                 className="absolute inset-0 flex items-center justify-center text-black font-rajdhani font-semibold transform -translate-y-1 transition-transform active:translate-y-0 transition cursor-pointer bg-neutral-200"
                 onClick={() => {
-                  currentOffset === currentQuery.totalOffsets ? (
-                    setLoading(true),
-                    setTotalOffsets(currentQuery.totalOffsets + 1),
-                    setCurrentOffset(currentOffset + 1)
-                  ) : (
-                    setCurrentPage(1),
-                    setLastPage(totalSize - (currentOffset + 1) * batchSize < batchSize ? Math.ceil((totalSize - (currentOffset + 1) * batchSize) / gamesPerPage) : 4),
-                    setPaginatedGames(games.slice((currentOffset + 1) * batchSize, (currentOffset + 1) * batchSize + gamesPerPage)),
-                    setCurrentOffset(currentOffset + 1)
-                  );
+                  if (currentOffset === currentQuery.totalOffsets) {
+                    setLoading(true);
+                    setTotalOffsets(currentQuery.totalOffsets + 1);
+                    setCurrentOffset(currentOffset + 1);
+                  } else {
+                    setCurrentPage(1);
+                    setLastPage(totalSize - (currentOffset + 1) * batchSize < batchSize ? Math.ceil((totalSize - (currentOffset + 1) * batchSize) / gamesPerPage) : 4);
+                    setPaginatedGames(games.slice((currentOffset + 1) * batchSize, (currentOffset + 1) * batchSize + gamesPerPage));
+                    setCurrentOffset(currentOffset + 1);
+                  }
                 }}
               >
                 &gt;
